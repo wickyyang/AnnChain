@@ -17,16 +17,12 @@ func main() {
 
 	app.Commands = []cli.Command{
 		commands.SignCommand,
-
-		commands.EVMCommands,
 		commands.AccountCommands,
 		commands.QueryCommands,
 		commands.TxCommands,
 		commands.SpecialCommands,
 		commands.InfoCommand,
-
 		commands.VersionCommands,
-
 		commands.SetupCommand,
 	}
 
