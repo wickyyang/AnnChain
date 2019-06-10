@@ -29,7 +29,7 @@ type Application interface {
 	GetAngineHooks() Hooks
 	CompatibleWithAngine()
 	CheckTx([]byte) error
-	Query([]byte) Result
+	Get([]byte) Result
 	Info() ResultInfo
 	Start() error
 	Stop()

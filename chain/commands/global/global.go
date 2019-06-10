@@ -33,7 +33,7 @@ const (
 	DefaultRuntimeDir = "~/.genesis"
 	DefaultLogDir     = "log"
 	DefaultCrypto     = crypto.CryptoTypeZhongAn
-	DefaultApp        = "evm"
+	DefaultApp        = "blockdb"
 )
 
 type GlobalFlags struct {
@@ -129,7 +129,7 @@ func CheckAndReadRuntimeConfig(runtimeDir string) (err error) {
 
 func CheckAppName(appName string) bool {
 	switch appName {
-	case "evm":
+	case "blockdb":
 		return true
 	}
 	return false

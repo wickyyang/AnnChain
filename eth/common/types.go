@@ -36,6 +36,10 @@ const (
 	HashLength = 32
 	// AddressLength is the expected length of the address
 	AddressLength = 20
+
+	MAX_KEY_LEN = 128
+
+	MAX_VALUE_LEN = 256
 )
 
 var (

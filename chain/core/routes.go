@@ -236,7 +236,7 @@ func (h *rpcHandler) QueryTx(query []byte) (*gtypes.ResultNumLimitTx, error) {
 }
 
 func (h *rpcHandler) Query(query []byte) (*gtypes.ResultQuery, error) {
-	return &gtypes.ResultQuery{Result: h.node.Application.Query(query)}, nil
+	return &gtypes.ResultQuery{Result: h.node.Application.Get(query)}, nil
 }
 
 func (h *rpcHandler) Info() (*gtypes.ResultInfo, error) {

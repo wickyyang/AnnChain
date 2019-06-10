@@ -15,7 +15,7 @@
 package app
 
 import (
-	"github.com/dappledger/AnnChain/chain/app/evm"
+	"github.com/dappledger/AnnChain/chain/app/blockdb"
 	atypes "github.com/dappledger/AnnChain/gemmill/types"
 	"github.com/spf13/viper"
 )
@@ -23,7 +23,7 @@ import (
 type AppMaker func(*viper.Viper) (atypes.Application, error)
 
 var AppMap = map[string]AppMaker{
-	"evm": func(c *viper.Viper) (atypes.Application, error) {
-		return evm.NewEVMApp(c)
+	"blockdb": func(c *viper.Viper) (atypes.Application, error) {
+		return blockdb.NewBlockDBApp(c)
 	},
 }
