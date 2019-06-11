@@ -233,7 +233,7 @@ func (app *BlockDBApp) OnExecute(height, round int64, block *atypes.Block) (inte
 		return nil, errors.Wrap(err, "create StateDB failed")
 	}
 
-	exeWithCPUSerialVeirfy(nil, block.Data.Txs, app.genExecFun(block, &res))
+	//	exeWithCPUSerialVeirfy(nil, block.Data.Txs, app.genExecFun(block, &res))
 
 	return res, err
 }
@@ -248,87 +248,87 @@ func makeCurrentHeader(block *atypes.Block, header *atypes.Header) *ethtypes.Hea
 	}
 }
 
-func (app *BlockDBApp) genExecFun(block *atypes.Block, res *atypes.ExecuteResult) BeginExecFunc {
+//func (app *BlockDBApp) genExecFun(block *atypes.Block, res *atypes.ExecuteResult) BeginExecFunc {
 
-	blockHash := ethcmn.BytesToHash(block.Hash())
+//	blockHash := ethcmn.BytesToHash(block.Hash())
 
-	app.currentHeader = makeCurrentHeader(block, block.Header)
+//	app.currentHeader = makeCurrentHeader(block, block.Header)
 
-	return func() (ExecFunc, EndExecFunc) {
+//	return func() (ExecFunc, EndExecFunc) {
 
-		state := app.currentState
+//		state := app.currentState
 
-		stateSnapshot := state.Snapshot()
+//		stateSnapshot := state.Snapshot()
 
-		tmpReceipt := make([]*ethtypes.SReceipt, 0)
+//		tmpReceipt := make([]*ethtypes.SReceipt, 0)
 
-		tmpTxHash := make([]ethcmn.Hash, 0)
+//		//		tmpTxHash := make([]ethcmn.Hash, 0)
 
-		execFunc := func(txIndex int, raw []byte, tx *ethtypes.Transaction) error {
+//		execFunc := func(txIndex int, raw []byte, tx *ethtypes.Transaction) error {
 
-			//			txBytes, err := rlp.EncodeToBytes(tx)
-			//			if err != nil {
-			//				return err
-			//			}
+//			//			txBytes, err := rlp.EncodeToBytes(tx)
+//			//			if err != nil {
+//			//				return err
+//			//			}
 
-			//txhash := ethcmn.BytesToHash(atypes.Tx(txBytes).Hash())
+//			//txhash := ethcmn.BytesToHash(atypes.Tx(txBytes).Hash())
 
-			txhash := tx.Hash()
+//			txhash := tx.Hash()
 
-			state.Prepare(txhash, blockHash, txIndex)
+//			state.Prepare(txhash, blockHash, txIndex)
 
-			state.SetNonce(tx.From(), state.GetNonce(tx.From())+1)
+//			state.SetNonce(tx.From(), state.GetNonce(tx.From())+1)
 
-			key := ethcmn.BytesToHash(append(tx.From().Bytes(), []byte(tx.Key())...))
+//			//			key := ethcmn.BytesToHash(append(tx.From().Bytes(), []byte(tx.Key())...))
 
-			tmpReceipt = append(tmpReceipt, &ethtypes.SReceipt{Height: app.currentHeader.Number.Uint64(), Timestamp: block.Time.UnixNano(), From: tx.From(), Key: key.Hex(), Value: tx.Value()})
+//			//			tmpReceipt = append(tmpReceipt, &ethtypes.SReceipt{Height: app.currentHeader.Number.Uint64(), Timestamp: block.Time.UnixNano(), From: tx.From(), Key: key.Hex(), Value: tx.Value()})
 
-			tmpTxHash = append(tmpTxHash, txhash)
+//			//			tmpTxHash = append(tmpTxHash, txhash)
 
-			return nil
-		}
+//			return nil
+//		}
 
-		endFunc := func(raw []byte, err error) bool {
-			if err != nil {
-				log.Warn("[evm execute],apply transaction", zap.Error(err))
-				state.RevertToSnapshot(stateSnapshot)
-				tmpReceipt = nil
-				tmpTxHash = nil
-				res.InvalidTxs = append(res.InvalidTxs, atypes.ExecuteInvalidTx{Bytes: raw, Error: err})
-				return true
-			}
-			app.sreceipt = append(app.sreceipt, tmpReceipt...)
-			app.valid_hashs = append(app.valid_hashs, tmpTxHash...)
-			res.ValidTxs = append(res.ValidTxs, raw)
+//		endFunc := func(raw []byte, err error) bool {
+//			if err != nil {
+//				log.Warn("[evm execute],apply transaction", zap.Error(err))
+//				state.RevertToSnapshot(stateSnapshot)
+//				tmpReceipt = nil
+//				tmpTxHash = nil
+//				res.InvalidTxs = append(res.InvalidTxs, atypes.ExecuteInvalidTx{Bytes: raw, Error: err})
+//				return true
+//			}
+//			app.sreceipt = append(app.sreceipt, tmpReceipt...)
+//			app.valid_hashs = append(app.valid_hashs, tmpTxHash...)
+//			res.ValidTxs = append(res.ValidTxs, raw)
 
-			return true
-		}
-		return execFunc, endFunc
-	}
-}
+//			return true
+//		}
+//		return execFunc, endFunc
+//	}
+//}
 
-func exeWithCPUSerialVeirfy(signer ethtypes.Signer, txs atypes.Txs, beginExec BeginExecFunc) error {
-	for i, raw := range txs {
-		txbs := atypes.Tx(txs[i])
-		exec, end := beginExec()
-		err := txbs.Deal(func(atx atypes.Tx) error {
-			var tx *ethtypes.Transaction
-			if len(atx) > 0 {
-				tx = new(ethtypes.Transaction)
-				if err := rlp.DecodeBytes(atx, tx); err != nil {
-					return err
-				}
-				if err := exec(i, raw, tx); err != nil {
-					return err
-				}
-			}
-			return nil
-		})
-		end(raw, err)
-	}
+//func exeWithCPUSerialVeirfy(signer ethtypes.Signer, txs atypes.Txs, beginExec BeginExecFunc) error {
+//	for i, raw := range txs {
+//		txbs := atypes.Tx(txs[i])
+//		exec, end := beginExec()
+//		err := txbs.Deal(func(atx atypes.Tx) error {
+//			var tx *ethtypes.Transaction
+//			if len(atx) > 0 {
+//				tx = new(ethtypes.Transaction)
+//				if err := rlp.DecodeBytes(atx, tx); err != nil {
+//					return err
+//				}
+//				if err := exec(i, raw, tx); err != nil {
+//					return err
+//				}
+//			}
+//			return nil
+//		})
+//		end(raw, err)
+//	}
 
-	return nil
-}
+//	return nil
+//}
 
 // OnCommit run in a sync way, we don't need to lock stateDupMtx, but stateMtx is still needed
 func (app *BlockDBApp) OnCommit(height, round int64, block *atypes.Block) (interface{}, error) {
@@ -351,7 +351,7 @@ func (app *BlockDBApp) OnCommit(height, round int64, block *atypes.Block) (inter
 
 	app.SaveLastBlock(LastBlockInfo{Height: height, AppHash: appHash.Bytes()})
 
-	rHash := app.SaveValues()
+	rHash := app.SaveValues(block.Data.Txs)
 	bHash := app.SaveBlocks(block.Hash())
 
 	app.valid_hashs = nil
@@ -417,35 +417,29 @@ func (app *BlockDBApp) SaveBlocks(blockHash []byte) []byte {
 	return bHash
 }
 
-func (app *BlockDBApp) SaveValues() []byte {
-
-	savedReceipts := make([][]byte, 0, len(app.sreceipt))
+func (app *BlockDBApp) SaveValues(txs atypes.Txs) []byte {
+	savedValues := make([][]byte, 0, len(txs))
 
 	receiptBatch := app.stateDb.NewBatch()
 
-	for _, receipt := range app.sreceipt {
+	for _, raw := range txs {
+		var tx *ethtypes.Transaction
+		if err := rlp.DecodeBytes(raw, tx); err != nil {
+			return nil
+		}
 
-		storageReceipt := (*ethtypes.SReceiptForStorage)(receipt)
-
-		storageReceiptBytes, err := rlp.EncodeToBytes(storageReceipt)
+		storageValueBytes, err := rlp.EncodeToBytes(tx.Data())
 		if err != nil {
 			fmt.Println("wrong rlp encode:" + err.Error())
 			return nil
 		}
 
-		//		if err := receiptBatch.Put(receipt.Key, receipt.Value); err != nil {
-		//			fmt.Println("batch kv failed:" + err.Error())
-		//			return nil
-		//		}
-
-		//		key := append(ReceiptsPrefix, receipt.TxHash.Bytes()...)
-
-		if err := receiptBatch.Put([]byte(receipt.Key), storageReceiptBytes); err != nil {
-			fmt.Println("batch receipt failed:" + err.Error())
+		if err := receiptBatch.Put(tx.Hash().Bytes(), storageValueBytes); err != nil {
+			fmt.Println("batch value failed:" + err.Error())
 			return nil
 		}
 
-		savedReceipts = append(savedReceipts, storageReceiptBytes)
+		savedValues = append(savedValues, storageValueBytes)
 	}
 
 	if err := receiptBatch.Write(); err != nil {
@@ -453,7 +447,7 @@ func (app *BlockDBApp) SaveValues() []byte {
 		return nil
 	}
 
-	rHash := merkle.SimpleHashFromHashes(savedReceipts)
+	rHash := merkle.SimpleHashFromHashes(savedValues)
 
 	return rHash
 }

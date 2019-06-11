@@ -30,7 +30,6 @@ type SReceipt struct {
 	Height    uint64         `json:"height"`
 	Timestamp int64          `json:"timestamp"`
 	From      common.Address `json:"from"`
-	Key       string         `json:"key"`
 	Value     []byte         `json:"value"`
 	TxHash    common.Hash    `json:"txhash" gencodec:"required"`
 	Status    uint64         `json:"status"`
@@ -41,7 +40,6 @@ type sreceiptRLP struct {
 	Height            uint64
 	Timestamp         int64
 	From              common.Address
-	Key               string
 	Value             []byte
 	PostStateOrStatus []byte
 	TxHash            common.Hash
@@ -51,7 +49,6 @@ type sreceiptStorageRLP struct {
 	Height            uint64
 	Timestamp         int64
 	From              common.Address
-	Key               string
 	Value             []byte
 	PostStateOrStatus []byte
 	TxHash            common.Hash
@@ -65,7 +62,7 @@ func NewSReceipt(root []byte) *Receipt {
 // EncodeRLP implements rlp.Encoder, and flattens the consensus fields of a receipt
 // into an RLP stream. If no post state is present, byzantium fork is assumed.
 func (r *SReceipt) EncodeRLP(w io.Writer) error {
-	return rlp.Encode(w, &sreceiptRLP{r.Height, r.Timestamp, r.From, r.Key, r.Value, r.statusEncoding(), r.TxHash})
+	return rlp.Encode(w, &sreceiptRLP{r.Height, r.Timestamp, r.From, r.Value, r.statusEncoding(), r.TxHash})
 }
 
 // DecodeRLP implements rlp.Decoder, and loads the consensus fields of a receipt
@@ -78,7 +75,7 @@ func (r *SReceipt) DecodeRLP(s *rlp.Stream) error {
 	if err := r.setStatus(dec.PostStateOrStatus); err != nil {
 		return err
 	}
-	r.Height, r.Timestamp, r.From, r.Key, r.Value, r.TxHash = dec.Height, dec.Timestamp, dec.From, dec.Key, dec.Value, dec.TxHash
+	r.Height, r.Timestamp, r.From, r.Value, r.TxHash = dec.Height, dec.Timestamp, dec.From, dec.Value, dec.TxHash
 	return nil
 }
 
@@ -116,7 +113,6 @@ func (r *SReceiptForStorage) EncodeRLP(w io.Writer) error {
 		Height:    r.Height,
 		Timestamp: r.Timestamp,
 		From:      r.From,
-		Key:       r.Key,
 		Value:     r.Value,
 		TxHash:    r.TxHash,
 	}
@@ -131,7 +127,7 @@ func (r *SReceiptForStorage) DecodeRLP(s *rlp.Stream) error {
 		return err
 	}
 	// Assign the implementation fields
-	r.Height, r.Timestamp, r.From, r.Key, r.Value, r.TxHash = dec.Height, dec.Timestamp, dec.From, r.Key, r.Value, dec.TxHash
+	r.Height, r.Timestamp, r.From, r.Value, r.TxHash = dec.Height, dec.Timestamp, dec.From, r.Value, dec.TxHash
 	return nil
 }
 

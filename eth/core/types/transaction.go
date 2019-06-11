@@ -41,9 +41,9 @@ type Transaction struct {
 }
 
 type txdata struct {
-	From  string `json:"from" gencodec:"required"`
-	Key   string `json:"key" gencodec:"required"`
-	Value []byte `json:"value" gencodec:"required"`
+	From      string   `json:"from" gencodec:"required"`
+	Timestamp *big.Int `json:"timestamp" gencodec:"required"`
+	Value     []byte   `json:"value" gencodec:"required"`
 
 	// Signature values
 	V *big.Int `json:"v" gencodec:"required"`
@@ -56,30 +56,31 @@ type txdata struct {
 
 type txdataMarshaling struct {
 	Value     hexutil.Bytes
-	Key, From string
+	Timestamp *big.Int
+	From      string
 
 	V *hexutil.Big
 	R *hexutil.Big
 	S *hexutil.Big
 }
 
-func NewTransaction(address, key string, value []byte) *Transaction {
-	return newTransaction(address, key, value)
+func NewTransaction(address string, timestamp *big.Int, value []byte) *Transaction {
+	return newTransaction(address, timestamp, value)
 }
 
-func newTransaction(address, key string, value []byte) *Transaction {
+func newTransaction(address string, timestamp *big.Int, value []byte) *Transaction {
 
 	if len(value) > 0 {
 		value = common.CopyBytes(value)
 	}
 
 	d := txdata{
-		From:  address,
-		Key:   key,
-		Value: value,
-		V:     new(big.Int),
-		R:     new(big.Int),
-		S:     new(big.Int),
+		From:      address,
+		Timestamp: timestamp,
+		Value:     value,
+		V:         new(big.Int),
+		R:         new(big.Int),
+		S:         new(big.Int),
 	}
 
 	return &Transaction{data: d}
@@ -161,8 +162,7 @@ func (tx *Transaction) Hash() common.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(common.Hash)
 	}
-	//v := rlpHash(tx)
-	v := rlpHash(append(tx.From().Bytes(), []byte(tx.Key())...))
+	v := rlpHash(tx)
 	tx.hash.Store(v)
 	return v
 }
@@ -171,8 +171,8 @@ func (tx *Transaction) From() common.Address {
 	return common.HexToAddress(tx.data.From)
 }
 
-func (tx *Transaction) Key() string {
-	return tx.data.Key
+func (tx *Transaction) Timestamp() *big.Int {
+	return tx.data.Timestamp
 }
 
 func (tx *Transaction) Value() []byte {

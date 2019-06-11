@@ -15,9 +15,9 @@ var _ = (*txdataMarshaling)(nil)
 
 func (t txdata) MarshalJSON() ([]byte, error) {
 	type txdata struct {
-		From  string `json:"from" gencodec:"required"`
-		Key   string `json:"key" gencodec:"required"`
-		Value []byte `json:"value" gencodec:"required"`
+		From      string   `json:"from" gencodec:"required"`
+		Timestamp *big.Int `json:"key" gencodec:"required"`
+		Value     []byte   `json:"value" gencodec:"required"`
 
 		V    *hexutil.Big `json:"v" gencodec:"required"`
 		R    *hexutil.Big `json:"r" gencodec:"required"`
@@ -26,7 +26,7 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 	}
 	var enc txdata
 
-	enc.Key = t.Key
+	enc.Timestamp = t.Timestamp
 	enc.Value = t.Value
 	enc.V = (*hexutil.Big)(t.V)
 	enc.R = (*hexutil.Big)(t.R)
@@ -37,9 +37,9 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 
 func (t *txdata) UnmarshalJSON(input []byte) error {
 	type txdata struct {
-		From  string `json:"from" gencodec:"required"`
-		Key   string `json:"key" gencodec:"required"`
-		Value []byte `json:"value" gencodec:"required"`
+		From      string   `json:"from" gencodec:"required"`
+		Timestamp *big.Int `json:"key" gencodec:"required"`
+		Value     []byte   `json:"value" gencodec:"required"`
 
 		V    *hexutil.Big `json:"v" gencodec:"required"`
 		R    *hexutil.Big `json:"r" gencodec:"required"`
