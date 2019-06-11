@@ -28,7 +28,7 @@ import (
 type SReceipt struct {
 	// Consensus fields
 	Height    uint64         `json:"height"`
-	Timestamp int64          `json:"timestamp"`
+	Timestamp uint64         `json:"timestamp"`
 	From      common.Address `json:"from"`
 	Value     []byte         `json:"value"`
 	TxHash    common.Hash    `json:"txhash" gencodec:"required"`
@@ -38,7 +38,7 @@ type SReceipt struct {
 // receiptRLP is the consensus encoding of a receipt.
 type sreceiptRLP struct {
 	Height            uint64
-	Timestamp         int64
+	Timestamp         uint64
 	From              common.Address
 	Value             []byte
 	PostStateOrStatus []byte
@@ -47,7 +47,7 @@ type sreceiptRLP struct {
 
 type sreceiptStorageRLP struct {
 	Height            uint64
-	Timestamp         int64
+	Timestamp         uint64
 	From              common.Address
 	Value             []byte
 	PostStateOrStatus []byte

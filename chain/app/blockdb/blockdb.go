@@ -268,7 +268,7 @@ func (app *BlockDBApp) genExecFun(block *atypes.Block, res *atypes.ExecuteResult
 
 			state.Prepare(txhash, blockHash, txIndex)
 
-			tmpReceipt = append(tmpReceipt, &ethtypes.SReceipt{Height: app.currentHeader.Number.Uint64(), Timestamp: tx.Timestamp().Int64(), From: tx.From(), Value: tx.Value(), TxHash: txhash})
+			tmpReceipt = append(tmpReceipt, &ethtypes.SReceipt{Height: app.currentHeader.Number.Uint64(), Timestamp: tx.Timestamp().Uint64(), From: tx.From(), Value: tx.Value(), TxHash: txhash})
 
 			return nil
 		}
