@@ -16,7 +16,7 @@ var _ = (*txdataMarshaling)(nil)
 func (t txdata) MarshalJSON() ([]byte, error) {
 	type txdata struct {
 		From      string   `json:"from" gencodec:"required"`
-		Timestamp *big.Int `json:"key" gencodec:"required"`
+		Timestamp *big.Int `json:"timestamp" gencodec:"required"`
 		Value     []byte   `json:"value" gencodec:"required"`
 
 		V    *hexutil.Big `json:"v" gencodec:"required"`
@@ -38,7 +38,7 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 func (t *txdata) UnmarshalJSON(input []byte) error {
 	type txdata struct {
 		From      string   `json:"from" gencodec:"required"`
-		Timestamp *big.Int `json:"key" gencodec:"required"`
+		Timestamp *big.Int `json:"timestamp" gencodec:"required"`
 		Value     []byte   `json:"value" gencodec:"required"`
 
 		V    *hexutil.Big `json:"v" gencodec:"required"`
