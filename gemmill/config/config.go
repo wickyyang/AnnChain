@@ -212,16 +212,16 @@ func setMempoolDefaults(conf *viper.Viper) {
 func setConsensusDefaults(conf *viper.Viper) {
 	conf.SetDefault("cs_wal_dir", path.Join(conf.GetString("runtime"), DATADIR, "cs.wal"))
 	conf.SetDefault("cs_wal_light", false)
-	conf.SetDefault("block_size", 2000)       // max number of txs
+	conf.SetDefault("block_size", 5000)       // max number of txs
 	conf.SetDefault("block_part_size", 65536) // part size 64K
 	conf.SetDefault("disable_data_hash", false)
-	conf.SetDefault("timeout_propose", 3000)
+	conf.SetDefault("timeout_propose", 1000)
 	conf.SetDefault("timeout_propose_delta", 1000)
-	conf.SetDefault("timeout_prevote", 2000)
+	conf.SetDefault("timeout_prevote", 1000)
 	conf.SetDefault("timeout_prevote_delta", 1000)
-	conf.SetDefault("timeout_precommit", 2000)
+	conf.SetDefault("timeout_precommit", 1000)
 	conf.SetDefault("timeout_precommit_delta", 1000)
-	conf.SetDefault("timeout_commit", 2000)
+	conf.SetDefault("timeout_commit", 1000)
 	conf.SetDefault("skip_timeout_commit", false)
 
 	conf.SetDefault("tracerouter_msg_ttl", 5) // seconds
@@ -240,7 +240,7 @@ func getPrivkeyFromConf(conf *viper.Viper) (privkey crypto.PrivKey) {
 
 func DefaultConfig() (conf *viper.Viper) {
 	conf = viper.New()
-	conf.Set("app_name", "evm")
+	conf.Set("app_name", "blockdb")
 	conf.Set("environment", "production")
 	conf.Set("moniker", "__MONIKER__")
 	conf.Set("db_backend", "leveldb")
@@ -257,15 +257,15 @@ func DefaultConfig() (conf *viper.Viper) {
 	conf.Set("non_validator_node_auth", false)
 	conf.SetDefault("tracerouter_msg_ttl", 5)
 	conf.Set("threshold_blocks", 0)
-	conf.SetDefault("block_size", 2000)
+	conf.SetDefault("block_size", 5000)
 
-	conf.SetDefault("timeout_propose", 3000)
+	conf.SetDefault("timeout_propose", 1000)
 	conf.SetDefault("timeout_propose_delta", 1000)
-	conf.SetDefault("timeout_prevote", 2000)
+	conf.SetDefault("timeout_prevote", 1000)
 	conf.SetDefault("timeout_prevote_delta", 1000)
-	conf.SetDefault("timeout_precommit", 2000)
+	conf.SetDefault("timeout_precommit", 1000)
 	conf.SetDefault("timeout_precommit_delta", 1000)
-	conf.SetDefault("timeout_commit", 2000)
+	conf.SetDefault("timeout_commit", 1000)
 
 	return conf
 }
