@@ -336,15 +336,15 @@ func (app *BlockDBApp) CheckTx(bs []byte) error {
 			return err
 		}
 
-		from, err := ethtypes.Sender(app.Signer, tx)
+		//		from, err := ethtypes.Sender(app.Signer, tx)
 
-		if err != nil {
-			return err
-		}
+		//		if err != nil {
+		//			return err
+		//		}
 
-		if tx.From().Hex() != from.Hex() {
-			return errors.New("address and privkey is mismatching")
-		}
+		//		if tx.From().Hex() != from.Hex() {
+		//			return errors.New("address and privkey is mismatching")
+		//		}
 
 		return nil
 	})
