@@ -84,8 +84,10 @@ type BlockDBApp struct {
 
 	core atypes.Core
 
-	datadir          string
-	Config           *viper.Viper
+	datadir string
+	Config  *viper.Viper
+
+	iSyncAllData     bool
 	syncDataAccounts map[string]bool
 
 	currentHeader *ethtypes.Header
@@ -115,23 +117,28 @@ func OpenDatabase(datadir string, name string, cache int, handles int) (ethdb.Da
 }
 
 func NewBlockDBApp(config *viper.Viper) (*BlockDBApp, error) {
-	var syncAccounts []string
+
 	syncDataAccounts := make(map[string]bool)
-	configSyncAccountsStr := config.GetString("sync_data_accounts")
-	if configSyncAccountsStr != "" {
-		syncAccounts = strings.Split(configSyncAccountsStr, ",")
-		for _, account := range syncAccounts {
-			accountLower := strings.ToLower(account)
-			if !strings.HasPrefix(accountLower, "0x") {
-				accountLower = fmt.Sprintf("%s%s", "0x", accountLower)
+	iSyncAllData := config.GetBool("is_sync_all_data")
+	if !iSyncAllData {
+		var syncAccounts []string
+		configSyncAccountsStr := config.GetString("sync_data_accounts")
+		if configSyncAccountsStr != "" {
+			syncAccounts = strings.Split(configSyncAccountsStr, ",")
+			for _, account := range syncAccounts {
+				accountLower := strings.ToLower(account)
+				if !strings.HasPrefix(accountLower, "0x") {
+					accountLower = fmt.Sprintf("%s%s", "0x", accountLower)
+				}
+				syncDataAccounts[accountLower] = true
 			}
-			syncDataAccounts[accountLower] = true
 		}
 	}
 
 	app := &BlockDBApp{
 		datadir:          config.GetString("db_dir"),
 		Config:           config,
+		iSyncAllData:     iSyncAllData,
 		syncDataAccounts: syncDataAccounts,
 	}
 
@@ -382,12 +389,19 @@ func (app *BlockDBApp) SaveValues() []byte {
 			return nil
 		}
 
-		fromAccount := receipt.From.String()
-		fromAccountLowerCase := strings.ToLower(fromAccount)
-		if app.syncDataAccounts[fromAccountLowerCase] {
+		if app.iSyncAllData {
 			if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
 				fmt.Println("batch receipt failed:" + err.Error())
 				return nil
+			}
+		} else {
+			fromAccount := receipt.From.String()
+			fromAccountLowerCase := strings.ToLower(fromAccount)
+			if app.syncDataAccounts[fromAccountLowerCase] {
+				if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
+					fmt.Println("batch receipt failed:" + err.Error())
+					return nil
+				}
 			}
 		}
 
