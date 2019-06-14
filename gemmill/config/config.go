@@ -254,11 +254,11 @@ func DefaultConfig() (conf *viper.Viper) {
 	conf.Set("fast_sync", true)
 	conf.Set("skip_upnp", true)
 	conf.Set("log_path", "")
+	conf.Set("sync_data_accounts", "")
 	conf.Set("non_validator_node_auth", false)
 	conf.SetDefault("tracerouter_msg_ttl", 5)
 	conf.Set("threshold_blocks", 0)
 	conf.SetDefault("block_size", 10000)
-
 	conf.SetDefault("timeout_propose", 2000)
 	conf.SetDefault("timeout_propose_delta", 1000)
 	conf.SetDefault("timeout_prevote", 2000)
