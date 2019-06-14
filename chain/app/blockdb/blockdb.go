@@ -384,7 +384,7 @@ func (app *BlockDBApp) SaveValues() []byte {
 
 		fromAccount := receipt.From.String()
 		fromAccountLowerCase := strings.ToLower(fromAccount)
-		if app.syncDataAccounts[fromAccountLowerCase] != true {
+		if app.syncDataAccounts[fromAccountLowerCase] {
 			if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
 				fmt.Println("batch receipt failed:" + err.Error())
 				return nil
