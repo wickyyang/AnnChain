@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"math/big"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	ethcmn "github.com/dappledger/AnnChain/eth/common"
@@ -83,8 +84,9 @@ type BlockDBApp struct {
 
 	core atypes.Core
 
-	datadir string
-	Config  *viper.Viper
+	datadir          string
+	Config           *viper.Viper
+	syncDataAccounts map[string]bool
 
 	currentHeader *ethtypes.Header
 
@@ -113,9 +115,24 @@ func OpenDatabase(datadir string, name string, cache int, handles int) (ethdb.Da
 }
 
 func NewBlockDBApp(config *viper.Viper) (*BlockDBApp, error) {
+	var syncAccounts []string
+	syncDataAccounts := make(map[string]bool)
+	configSyncAccountsStr := config.GetString("sync_data_accounts")
+	if configSyncAccountsStr != "" {
+		syncAccounts = strings.Split(configSyncAccountsStr, ",")
+		for _, account := range syncAccounts {
+			accountLower := strings.ToLower(account)
+			if !strings.HasPrefix(accountLower, "0x") {
+				accountLower = fmt.Sprintf("%s%s", "0x", accountLower)
+			}
+			syncDataAccounts[accountLower] = true
+		}
+	}
+
 	app := &BlockDBApp{
-		datadir: config.GetString("db_dir"),
-		Config:  config,
+		datadir:          config.GetString("db_dir"),
+		Config:           config,
+		syncDataAccounts: syncDataAccounts,
 	}
 
 	app.AngineHooks = atypes.Hooks{
@@ -336,15 +353,15 @@ func (app *BlockDBApp) CheckTx(bs []byte) error {
 			return err
 		}
 
-		//		from, err := ethtypes.Sender(app.Signer, tx)
+		from, err := ethtypes.Sender(app.Signer, tx)
 
-		//		if err != nil {
-		//			return err
-		//		}
+		if err != nil {
+			return err
+		}
 
-		//		if tx.From().Hex() != from.Hex() {
-		//			return errors.New("address and privkey is mismatching")
-		//		}
+		if tx.From().Hex() != from.Hex() {
+			return errors.New("address and privkey is mismatching")
+		}
 
 		return nil
 	})
@@ -357,7 +374,6 @@ func (app *BlockDBApp) SaveValues() []byte {
 	receiptBatch := app.stateDb.NewBatch()
 
 	for _, receipt := range app.sreceipt {
-
 		storageReceipt := (*ethtypes.SReceiptForStorage)(receipt)
 
 		storageReceiptBytes, err := rlp.EncodeToBytes(storageReceipt)
@@ -366,9 +382,13 @@ func (app *BlockDBApp) SaveValues() []byte {
 			return nil
 		}
 
-		if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
-			fmt.Println("batch receipt failed:" + err.Error())
-			return nil
+		fromAccount := receipt.From.String()
+		fromAccountLowerCase := strings.ToLower(fromAccount)
+		if app.syncDataAccounts[fromAccountLowerCase] != true {
+			if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
+				fmt.Println("batch receipt failed:" + err.Error())
+				return nil
+			}
 		}
 
 		savedReceipts = append(savedReceipts, storageReceiptBytes)
