@@ -229,10 +229,6 @@ func (app *BlockDBApp) OnExecute(height, round int64, block *atypes.Block) (inte
 		err error
 	)
 
-	//	if app.currentState, err = ethstate.New(app.getLastAppHash(), ethstate.NewDatabase(app.stateDb)); err != nil {
-	//		return nil, errors.Wrap(err, "create StateDB failed")
-	//	}
-
 	exeWithCPUSerialVeirfy(nil, block.Data.Txs, app.genExecFun(block, &res))
 
 	return res, err
@@ -250,23 +246,15 @@ func makeCurrentHeader(block *atypes.Block, header *atypes.Header) *ethtypes.Hea
 
 func (app *BlockDBApp) genExecFun(block *atypes.Block, res *atypes.ExecuteResult) BeginExecFunc {
 
-	//blockHash := ethcmn.BytesToHash(block.Hash())
-
 	app.currentHeader = makeCurrentHeader(block, block.Header)
 
 	return func() (ExecFunc, EndExecFunc) {
-
-		//		state := app.currentState
-
-		//		stateSnapshot := state.Snapshot()
 
 		tmpReceipt := make([]*ethtypes.SReceipt, 0)
 
 		execFunc := func(txIndex int, raw []byte, tx *ethtypes.Transaction) error {
 
 			txhash := tx.Hash()
-
-			//state.Prepare(txhash, blockHash, txIndex)
 
 			tmpReceipt = append(tmpReceipt, &ethtypes.SReceipt{Height: app.currentHeader.Number.Uint64(), Timestamp: tx.Timestamp().Uint64(), From: tx.From(), Value: tx.Value(), TxHash: txhash})
 
@@ -276,7 +264,6 @@ func (app *BlockDBApp) genExecFun(block *atypes.Block, res *atypes.ExecuteResult
 		endFunc := func(raw []byte, err error) bool {
 			if err != nil {
 				log.Warn("[evm execute],apply transaction", zap.Error(err))
-				//state.RevertToSnapshot(stateSnapshot)
 				tmpReceipt = nil
 				res.InvalidTxs = append(res.InvalidTxs, atypes.ExecuteInvalidTx{Bytes: raw, Error: err})
 				return true
@@ -316,33 +303,23 @@ func exeWithCPUSerialVeirfy(signer ethtypes.Signer, txs atypes.Txs, beginExec Be
 // OnCommit run in a sync way, we don't need to lock stateDupMtx, but stateMtx is still needed
 func (app *BlockDBApp) OnCommit(height, round int64, block *atypes.Block) (interface{}, error) {
 
-	//appHash, err := app.currentState.Commit(StateRemoveEmptyObj)
-	//	if err != nil {
-	//		return nil, err
-	//	}
+	var err error
 
-	//	if err := app.currentState.Database().TrieDB().Commit(appHash, false); err != nil {
-	//		return nil, err
-	//	}
+	app.stateMtx.Lock()
+	if app.state, err = ethstate.New(app.getLastAppHash(), ethstate.NewDatabase(app.stateDb)); err != nil {
+		app.stateMtx.Unlock()
+		return nil, errors.Wrap(err, "create StateDB failed")
+	}
+	app.stateMtx.Unlock()
 
-	//	app.stateMtx.Lock()
-	//	if app.state, err = ethstate.New(appHash, ethstate.NewDatabase(app.stateDb)); err != nil {
-	//		app.stateMtx.Unlock()
-	//		return nil, errors.Wrap(err, "create StateDB failed")
-	//	}
-	//	app.stateMtx.Unlock()
-
-	appHash := ethcmn.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b425")
-
-	app.SaveLastBlock(LastBlockInfo{Height: height, AppHash: appHash.Bytes()})
+	app.SaveLastBlock(LastBlockInfo{Height: height, AppHash: nil})
 
 	rHash := app.SaveValues()
 
-	//	app.valid_hashs = nil
 	app.sreceipt = nil
 
 	return atypes.CommitResult{
-		AppHash:      appHash.Bytes(),
+		AppHash:      nil,
 		ReceiptsHash: rHash,
 	}, nil
 }
