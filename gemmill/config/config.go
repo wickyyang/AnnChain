@@ -254,7 +254,6 @@ func DefaultConfig() (conf *viper.Viper) {
 	conf.Set("fast_sync", true)
 	conf.Set("skip_upnp", true)
 	conf.Set("log_path", "")
-	conf.Set("is_sync_all_data", true)
 	conf.Set("sync_data_accounts", "")
 	conf.Set("non_validator_node_auth", false)
 	conf.SetDefault("tracerouter_msg_ttl", 5)

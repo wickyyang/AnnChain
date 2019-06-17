@@ -119,20 +119,23 @@ func OpenDatabase(datadir string, name string, cache int, handles int) (ethdb.Da
 func NewBlockDBApp(config *viper.Viper) (*BlockDBApp, error) {
 
 	syncDataAccounts := make(map[string]bool)
-	iSyncAllData := config.GetBool("is_sync_all_data")
-	if !iSyncAllData {
-		var syncAccounts []string
-		configSyncAccountsStr := config.GetString("sync_data_accounts")
-		if configSyncAccountsStr != "" {
-			syncAccounts = strings.Split(configSyncAccountsStr, ",")
-			for _, account := range syncAccounts {
-				accountLower := strings.ToLower(account)
-				if !strings.HasPrefix(accountLower, "0x") {
-					accountLower = fmt.Sprintf("%s%s", "0x", accountLower)
-				}
-				syncDataAccounts[accountLower] = true
+	//	iSyncAllData := config.GetBool("is_sync_all_data")
+	//	if !iSyncAllData {
+	var syncAccounts []string
+	var iSyncAllData bool
+	configSyncAccountsStr := config.GetString("sync_data_accounts")
+	if configSyncAccountsStr != "" {
+		iSyncAllData = false
+		syncAccounts = strings.Split(configSyncAccountsStr, ",")
+		for _, account := range syncAccounts {
+			accountLower := strings.ToLower(account)
+			if !strings.HasPrefix(accountLower, "0x") {
+				accountLower = fmt.Sprintf("%s%s", "0x", accountLower)
 			}
+			syncDataAccounts[accountLower] = true
 		}
+	} else {
+		iSyncAllData = true
 	}
 
 	app := &BlockDBApp{
