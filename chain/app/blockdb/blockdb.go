@@ -381,7 +381,7 @@ func (app *BlockDBApp) SaveValues() []byte {
 
 	savedReceipts := make([][]byte, 0, len(app.sreceipt))
 
-	receiptBatch := app.stateDb.NewBatch()
+	//	receiptBatch := app.stateDb.NewBatch()
 
 	for _, receipt := range app.sreceipt {
 		storageReceipt := (*ethtypes.SReceiptForStorage)(receipt)
@@ -392,29 +392,29 @@ func (app *BlockDBApp) SaveValues() []byte {
 			return nil
 		}
 
-		if app.iSyncAllData {
-			if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
-				fmt.Println("batch receipt failed:" + err.Error())
-				return nil
-			}
-		} else {
-			fromAccount := receipt.From.String()
-			fromAccountLowerCase := strings.ToLower(fromAccount)
-			if app.syncDataAccounts[fromAccountLowerCase] {
-				if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
-					fmt.Println("batch receipt failed:" + err.Error())
-					return nil
-				}
-			}
-		}
+		//		if app.iSyncAllData {
+		//			if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
+		//				fmt.Println("batch receipt failed:" + err.Error())
+		//				return nil
+		//			}
+		//		} else {
+		//			fromAccount := receipt.From.String()
+		//			fromAccountLowerCase := strings.ToLower(fromAccount)
+		//			if app.syncDataAccounts[fromAccountLowerCase] {
+		//				if err := receiptBatch.Put(receipt.TxHash.Bytes(), storageReceiptBytes); err != nil {
+		//					fmt.Println("batch receipt failed:" + err.Error())
+		//					return nil
+		//				}
+		//			}
+		//		}
 
 		savedReceipts = append(savedReceipts, storageReceiptBytes)
 	}
 
-	if err := receiptBatch.Write(); err != nil {
-		fmt.Println("persist receipts failed:" + err.Error())
-		return nil
-	}
+	//	if err := receiptBatch.Write(); err != nil {
+	//		fmt.Println("persist receipts failed:" + err.Error())
+	//		return nil
+	//	}
 
 	rHash := merkle.SimpleHashFromHashes(savedReceipts)
 
