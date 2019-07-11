@@ -12,6 +12,11 @@ import (
 	"github.com/dappledger/AnnChain/modules/signer"
 )
 
+var (
+	OP_PUT byte = 0x01
+	OP_GET byte = 0x02
+)
+
 type Transaction struct {
 	data txdata
 	// caches
@@ -24,6 +29,7 @@ type txdata struct {
 	From      string   `json:"from" gencodec:"required"`
 	Timestamp *big.Int `json:"timestamp" gencodec:"required"`
 	Value     []byte   `json:"value" gencodec:"required"`
+	Op        byte     `json:"opcode" gencodec:"required"`
 
 	// Signature values
 	V *big.Int `json:"v" gencodec:"required"`
@@ -31,11 +37,11 @@ type txdata struct {
 	S *big.Int `json:"s" gencodec:"required"`
 }
 
-func NewTransaction(address string, timestamp *big.Int, value []byte) *Transaction {
-	return newTransaction(address, timestamp, value)
+func NewTransaction(address string, timestamp *big.Int, value []byte, opcode byte) *Transaction {
+	return newTransaction(address, timestamp, value, opcode)
 }
 
-func newTransaction(address string, timestamp *big.Int, value []byte) *Transaction {
+func newTransaction(address string, timestamp *big.Int, value []byte, opcode byte) *Transaction {
 	if len(value) > 0 {
 		value = common.CopyBytes(value)
 	}
@@ -43,12 +49,15 @@ func newTransaction(address string, timestamp *big.Int, value []byte) *Transacti
 		From:      address,
 		Timestamp: timestamp,
 		Value:     value,
+		Op:        opcode,
 		V:         new(big.Int),
 		R:         new(big.Int),
 		S:         new(big.Int),
 	}
 	return &Transaction{data: d}
 }
+
+func (tx *Transaction) Op() byte { return tx.data.Op }
 
 func (tx *Transaction) Data() []byte { return common.CopyBytes(tx.data.Value) }
 

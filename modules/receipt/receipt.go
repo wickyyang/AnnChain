@@ -26,6 +26,7 @@ type Receipt struct {
 	Timestamp uint64         `json:"timestamp"`
 	From      common.Address `json:"from"`
 	Value     []byte         `json:"value"`
+	Op        byte           `json:"opcode"`
 	TxHash    common.Hash    `json:"txhash" gencodec:"required"`
 }
 
