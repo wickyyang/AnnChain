@@ -70,8 +70,6 @@ services:
               block_size = 5000
               crypto_type = "ZA"
               db_backend = "leveldb"
-              db_conn_str = "sqlite3"
-              db_type = "sqlite3"
               environment = "production"
               fast_sync = true
               log_path = ""
@@ -111,8 +109,6 @@ services:
               block_size = 5000
               crypto_type = "ZA"
               db_backend = "leveldb"
-              db_conn_str = "sqlite3"
-              db_type = "sqlite3"
               environment = "production"
               fast_sync = true
               log_path = ""
@@ -152,8 +148,6 @@ services:
               block_size = 5000
               crypto_type = "ZA"
               db_backend = "leveldb"
-              db_conn_str = "sqlite3"
-              db_type = "sqlite3"
               environment = "production"
               fast_sync = true
               log_path = ""
@@ -193,8 +187,6 @@ services:
               block_size = 5000
               crypto_type = "ZA"
               db_backend = "leveldb"
-              db_conn_str = "sqlite3"
-              db_type = "sqlite3"
               environment = "production"
               fast_sync = true
               log_path = ""

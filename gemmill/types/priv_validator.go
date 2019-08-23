@@ -139,7 +139,7 @@ func LoadOrGenPrivValidator(filePath string) *PrivValidator {
 	var privValidator *PrivValidator
 	if _, err := os.Stat(filePath); err == nil {
 		privValidator, _ = LoadPrivValidator(filePath)
-		log.Infow("Loaded PrivValidator", "file", filePath, "privValidator", privValidator)
+		//log.Infow("Loaded PrivValidator", "file", filePath, "privValidator", privValidator)
 	} else {
 		privValidator, _ = GenPrivValidator("", nil)
 		privValidator.SetFile(filePath)
